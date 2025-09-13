@@ -68,9 +68,6 @@ func checkNodesValidity(nodes map[string]hainish.Node) error {
 		if node.Name() == "" {
 			return uerr.NewError(util.ErrNodeNameEmpty)
 		}
-		if node.Action == nil {
-			return uerr.NewError(util.ErrNodeActionNil)
-		}
 	}
 
 	return nil
