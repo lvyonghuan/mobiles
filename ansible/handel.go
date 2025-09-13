@@ -62,9 +62,27 @@ func (p *peerManager) handelCreateWorkflow(s network.Stream) {
 	p.ansible.getRuntime().InitWorkflow(workflowID)
 }
 
-//TODO deleteWorkflow
+func (p *peerManager) handelDeleteWorkflow(s network.Stream) {
+	defer s.Close()
 
-func (p *peerManager) createNodeProtocol(s network.Stream) {
+	var workflowID int
+	err := readFromStream(s, &workflowID)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	// Delete a workflow
+	err = p.ansible.getRuntime().DeleteWorkflow(workflowID)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	return
+}
+
+func (p *peerManager) handelCreateNodeProtocol(s network.Stream) {
 	defer s.Close()
 
 	var message createNodeMessage
@@ -82,11 +100,47 @@ func (p *peerManager) createNodeProtocol(s network.Stream) {
 	}
 }
 
-//TODO deleteNodeProtocol
+func (p *peerManager) handelDeleteNodeProtocol(s network.Stream) {
+	defer s.Close()
 
-//TODO setParamProtocol
+	var message deleteNodeMessage
+	err := readFromStream(s, &message)
+	if err != nil {
+		//TODO log
+		return
+	}
 
-func (p *peerManager) createEdgeProtocol(s network.Stream) {
+	// Delete a node
+	err = p.ansible.getRuntime().DeleteNode(message.WorkflowID, message.NodeID)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	return
+}
+
+func (p *peerManager) handelSetParamProtocol(s network.Stream) {
+	defer s.Close()
+
+	var message setParamMessage
+	err := readFromStream(s, &message)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	// Set the param
+	err = p.ansible.getRuntime().SetParam(message.WorkflowID, message.NodeID, message.ParamName, message.ParamValue)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	return
+}
+
+func (p *peerManager) handelCreateEdgeProtocol(s network.Stream) {
 	defer s.Close()
 
 	var message createEdgeMessage
@@ -97,14 +151,32 @@ func (p *peerManager) createEdgeProtocol(s network.Stream) {
 	}
 
 	// Create an edge
-	err = p.ansible.getRuntime().CreateEdge(message.Destination, message.WorkflowID, message.ProducerNodeID, message.ProducerPortName, message.ConsumerNodeID, message.ConsumerPortName)
+	err = p.ansible.getRuntime().CreateEdge(message.EdgeID, message.Destination, message.WorkflowID, message.ProducerNodeID, message.ProducerPortName, message.ConsumerNodeID, message.ConsumerPortName)
 	if err != nil {
 		//TODO log
 		return
 	}
 }
 
-//TODO deleteEdgeProtocol
+func (p *peerManager) handelDeleteEdgeProtocol(s network.Stream) {
+	defer s.Close()
+
+	var message deleteEdgeMessage
+	err := readFromStream(s, &message)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	// Delete an edge
+	err = p.ansible.getRuntime().DeleteEdge(message.WorkflowID, message.EdgeID)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	return
+}
 
 func (p *peerManager) handelRunWorkflow(s network.Stream) {
 	defer s.Close()
@@ -136,4 +208,24 @@ func (p *peerManager) handelRunWorkflow(s network.Stream) {
 
 	// Run the listener
 	go wl.run()
+}
+
+func (p *peerManager) handelStopWorkflow(s network.Stream) {
+	defer s.Close()
+
+	var workflowID int
+	err := readFromStream(s, &workflowID)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	// Stop the workflow
+	err = p.ansible.getRuntime().StopWorkflow(workflowID)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	return
 }

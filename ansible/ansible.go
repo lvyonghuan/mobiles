@@ -116,11 +116,21 @@ func (asb *ImplAnsible) setProtocolAndHandel() {
 	// Create workflow protocol
 	asb.h.SetStreamHandler(createWorkflow, asb.peerStore.handelCreateWorkflow)
 	// Create node protocol
-	asb.h.SetStreamHandler(createNodeProtocol, asb.peerStore.createNodeProtocol)
+	asb.h.SetStreamHandler(createNodeProtocol, asb.peerStore.handelCreateNodeProtocol)
 	// Create edge protocol
-	asb.h.SetStreamHandler(createEdgeProtocol, asb.peerStore.createEdgeProtocol)
+	asb.h.SetStreamHandler(createEdgeProtocol, asb.peerStore.handelCreateEdgeProtocol)
 	// Passing data protocol
 	asb.h.SetStreamHandler(runWorkflowProtocol, asb.peerStore.handelRunWorkflow)
+	// Delete workflow protocol
+	asb.h.SetStreamHandler(deleteWorkflow, asb.peerStore.handelDeleteWorkflow)
+	// Delete node protocol
+	asb.h.SetStreamHandler(deleteNodeProtocol, asb.peerStore.handelDeleteNodeProtocol)
+	// Set param protocol
+	asb.h.SetStreamHandler(setParamProtocol, asb.peerStore.handelSetParamProtocol)
+	// Delete edge protocol
+	asb.h.SetStreamHandler(deleteEdgeProtocol, asb.peerStore.handelDeleteEdgeProtocol)
+	// Stop workflow protocol
+	asb.h.SetStreamHandler(stopWorkflowProtocol, asb.peerStore.handelStopWorkflow)
 }
 
 // Add link based on workflow as the scale

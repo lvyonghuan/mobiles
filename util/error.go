@@ -16,6 +16,8 @@ var (
 	ErrWorkflowNotFound       = errors.New("workflow not found")
 	ErrNodeNotFoundInWorkflow = errors.New("node not found")
 	ErrPortNotFoundInNode     = errors.New("port not found in node")
+	ErrDeletingNodeHasEdges   = errors.New("cannot delete node with existing edges")
+	ErrPortNotExist           = errors.New("port not exist")
 )
 
 var (
