@@ -2,6 +2,7 @@ package ansible
 
 import (
 	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/lvyonghuan/mobiles/hainish"
 )
 
 func (p *peerManager) handelHeartbeat(s network.Stream) {
@@ -228,4 +229,22 @@ func (p *peerManager) handelStopWorkflow(s network.Stream) {
 	}
 
 	return
+}
+
+func (p *peerManager) handelPassingDataProtocol(s network.Stream) {
+	defer s.Close()
+
+	var data hainish.Edge
+	err := readFromStream(s, &data)
+	if err != nil {
+		//TODO log
+		return
+	}
+
+	//TODO Passing the data to the runtime
+	err = p.ansible.getRuntime().PassingProcessDataToRuntimeNode(data)
+	if err != nil {
+		//TODO log
+		return
+	}
 }

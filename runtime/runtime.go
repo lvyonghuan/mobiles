@@ -217,3 +217,28 @@ func (r *Runtime) SetParam(workflowID, nodeID int, portName string, value any) e
 	node.params[portName] = value
 	return nil
 }
+
+func (r *Runtime) PassingProcessDataToRuntimeNode(data hainish.Edge) error {
+	wf, exist := r.workflows[data.TargetWorkflowID]
+	if !exist {
+		return uerr.NewError(util.ErrWorkflowNotFound)
+	}
+
+	node, exist := wf.runtimeNodes[data.TargetNodeID]
+	if !exist {
+		return uerr.NewError(util.ErrNodeNotFoundInWorkflow)
+	}
+
+	port, exist := (*node.node).Inputs()[data.TargetPort]
+	if !exist {
+		return uerr.NewError(util.ErrPortNotFoundInNode)
+	}
+
+	// Send data to the port
+	select { // Non-blocking send to avoid deadlock
+	case port.Chan() <- data.Value:
+	case <-wf.c.Done():
+		return nil
+	}
+	return nil
+}

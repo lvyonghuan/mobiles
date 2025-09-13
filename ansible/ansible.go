@@ -131,6 +131,8 @@ func (asb *ImplAnsible) setProtocolAndHandel() {
 	asb.h.SetStreamHandler(deleteEdgeProtocol, asb.peerStore.handelDeleteEdgeProtocol)
 	// Stop workflow protocol
 	asb.h.SetStreamHandler(stopWorkflowProtocol, asb.peerStore.handelStopWorkflow)
+	// passing data protocol
+	asb.h.SetStreamHandler(passingDataProtocol, asb.peerStore.handelPassingDataProtocol)
 }
 
 // Add link based on workflow as the scale
